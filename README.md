@@ -8,6 +8,11 @@ A collection of interactive animations made with code in Swift Playgrounds app
    <a href="https://en.wikipedia.org/wiki/MIT_License"><img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License: MIT" /></a>
   
 Click on images to see the code :point_down:
+#### Crashing Buttons
+<p align="left">
+   <a href="https://github.com/gadirom/Art-in-Swift/blob/main/Crashing%20Button.swift"><img src="GIFs/Crashing Buttons .GIF" alt="GIF"/>
+</p>      
+    
 #### Hexagons and Pendulums
 <p align="left">
    <a href="https://github.com/gadirom/Art-in-Swift/blob/main/Hexagon%20Pendulums.swift"><img src="GIFs/Hexagon Pendulums.GIF" alt="GIF"/>
