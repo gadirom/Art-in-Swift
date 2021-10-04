@@ -8,6 +8,12 @@ A collection of interactive animations made with code in Swift Playgrounds app
    <a href="https://en.wikipedia.org/wiki/MIT_License"><img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License: MIT" /></a>
   
 Click on images to see the code :point_down:
+    
+#### Button on Ropes
+<p align="left">
+   <a href="https://github.com/gadirom/Art-in-Swift/blob/main/Button%20on%20Ropes.swift"><img src="GIFs/Button on Ropes.gif" alt="GIF"/>
+</p>      
+    
 #### Crashing Buttons
 <p align="left">
    <a href="https://github.com/gadirom/Art-in-Swift/blob/main/Crashing%20Button.swift"><img src="GIFs/Crashing Buttons .GIF" alt="GIF"/>
