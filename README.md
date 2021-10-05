@@ -9,7 +9,12 @@ A collection of interactive animations made with code in Swift Playgrounds app
   
 Click on images to see the code :point_down:
     
-#### Button on Ropes
+#### Ray Marching Toggle (with Metal shader inside a SwiftUI view)
+<p align="left">
+   <a href="https://github.com/gadirom/Art-in-Swift/blob/main/Ray%20Marching%20Toggle.swift"><img src="GIFs/Ray Marching Toggle.gif" alt="GIF"/>
+</p>      
+    
+#### Button on Ropes (physics simulation in real time)
 <p align="left">
    <a href="https://github.com/gadirom/Art-in-Swift/blob/main/Button%20on%20Ropes.swift"><img src="GIFs/Button on Ropes.gif" alt="GIF"/>
 </p>      
