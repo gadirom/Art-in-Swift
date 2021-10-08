@@ -1,3 +1,7 @@
+// Just copy and paste the code into a blank playground template
+// in Swift Playgrounds app on an iPad or a Mac
+// !!! Turn off Enable Results in the settings, otherwise you'll get an error !!!
+// Created by Roman Gaditskiy: https://GitHub.com/gadirom/Art-in-Swift
 
 import MetalKit
 import SwiftUI
