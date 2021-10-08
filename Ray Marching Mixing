@@ -1,0 +1,379 @@
+
+// Just copy and paste the code into a blank playground template
+// in Swift Playgrounds app on an iPad or a Mac
+// !!! Turn off Enable Results in the settings, otherwise you'll get an error !!!
+// Created by Roman Gaditskiy: https://GitHub.com/gadirom/Art-in-Swift
+
+import MetalKit
+import SwiftUI
+import PlaygroundSupport
+import Combine
+import simd
+
+//Sphere colors
+let colors:[float3] = [float3(x: 1, y: 0, z: 0),
+                       float3(x: 0, y: 1, z: 0),
+                       float3(x: 0, y: 0, z: 1),
+                       float3(x: 1, y: 1, z: 0),
+                       float3(x: 1, y: 0, z: 1),
+                       float3(x: 0.4, y: 0.3, z: 0.8),
+                       float3(x: 0.9, y: 0.3, z: 0.7),
+                       float3(x: 0.5, y: 0.3, z: 0.1),
+                       float3(x: 0.2, y: 0.5, z: 0.2),
+                       float3(x: 0.6, y: 1.0, z: 0.3)
+]
+
+var light: Float = 0
+var dist: Float = 0
+
+var sphereBuffer: MTLBuffer?
+
+var spheres: UnsafeMutablePointer<Sphere>?
+
+struct Sphere {
+    var s: float3 
+    var c: float3
+    var size: Float
+}
+
+struct Uniforms {
+    //Light Position
+    var lx: Float = 0
+    var ly: Float = 0
+    var lz: Float = 0
+    
+    //Time
+    var t: Float = 0
+    
+    //Blending
+    var k: Float = 0
+    
+    //Distance
+    var d: Float = 0
+    
+    //Spheres
+    var sphereCount: Int = 10
+    var size: Float = 0
+}
+
+let metalFunctions = """
+
+#include <metal_stdlib>
+
+using namespace metal;
+
+typedef struct
+{
+   float3 s;
+   float3 c;
+   float size;
+} Sphere;
+
+typedef struct
+{
+   float lx;
+   float ly;
+   float lz;
+
+   float t;
+   float k;
+   float d;
+
+   int sc;
+   float ss;
+
+} Uniforms;
+
+#define MAX_STEPS 100
+#define MAX_DIST 7.
+#define SURF_DIST 0.1
+
+ //distance for softmin:
+#define K_Dist 0.5
+
+float4x4 rotationMatrix(float3 axis, float angle) {
+    axis = normalize(axis);
+    float s = sin(angle);
+    float c = cos(angle);
+    float oc = 1.0 - c;
+    
+    return float4x4(oc * axis.x * axis.x + c,           oc * axis.x * axis.y - axis.z * s,  oc * axis.z * axis.x + axis.y * s,  0.0,
+                oc * axis.x * axis.y + axis.z * s,  oc * axis.y * axis.y + c,           oc * axis.y * axis.z - axis.x * s,  0.0,
+                oc * axis.z * axis.x - axis.y * s,  oc * axis.y * axis.z + axis.x * s,  oc * axis.z * axis.z + c,           0.0,
+                0.0,                                0.0,                                0.0,                                1.0);
+}
+
+float3 rotate(float3 v, float3 axis, float angle) {
+    float4x4 m = rotationMatrix(axis, angle);
+    return (m * float4(v, 1.0)).xyz;
+}
+
+float4 smin(float a, float b, float3 ca, float3 cb, float k) {
+    float h = clamp(0.5 + 0.5*(a-b)/k, 0.0, 1.0);
+    float d = mix(a, b, h) - k*h*(1.0-h);
+    float3 c = mix(ca, cb, h) - k*h*(1.0-h);
+    return float4(c, d);
+}
+
+float sdSphere( float3 p, float3 c, float r ) {
+    return length(p - c) - r;
+}
+
+float4 getDist( float3 p, constant Uniforms *u, constant Sphere *sp ) {
+
+    float3 c = float3(sp[0].s);  
+
+    float4 d = float4(sp[0].c, sdSphere(p, c, sp[0].size));
+
+    for (int i = 1; i < u->sc; i++) {
+       
+       c = float3(sp[i].s);  
+       float sphere = sdSphere(p, c, sp[i].size);
+       d = smin(sphere, d.w, sp[i].c, d.xyz, u->k);   
+
+      }
+    return d;
+}
+
+float4 castRay( float3 ro, float3 rd, constant Uniforms *u, constant Sphere *sp) {
+    float d0 = 0.0;
+    float3 c;
+    
+    for (int i = 0; i < MAX_STEPS; i++) {
+        float3 p = ro + d0 * rd;
+        float4 dS = getDist(p, u, sp);
+        
+        d0 += dS.w;
+        c =  dS.xyz;
+        if ( dS.w <= SURF_DIST || d0 >= MAX_DIST ) break;
+    }
+    
+    return float4(c, d0);
+}
+
+float3 getNormal ( float3 p, constant Uniforms *u, constant Sphere *sp) {
+  float d = getDist(p, u, sp).w;
+  float2 e = float2(0.01, 0.);
+  
+  float3 n = d - float3( getDist(p - e.xyy, u, sp).w,
+                         getDist(p - e.yxy, u, sp).w,
+                         getDist(p - e.yyx, u, sp).w );
+                     
+  return normalize(n);
+}
+
+float3 getLight( float3 p, constant Uniforms *u, constant Sphere *sp, float3 bg, float3 rd, float3 c) {
+
+  float3 lightPos = float3(u->lx, u->ly, u->lz);
+  float3 l = normalize( lightPos - p );
+  float3 n = getNormal(p, u, sp);
+  
+  float diffl = dot(l, n);
+  
+  float3 diff = diffl * c + float3(pow(diffl,100.)/2);
+
+  float frensel = pow(1. + dot(rd, n), 3);
+  diff = mix(diff, bg, frensel);
+  
+  return diff;
+}
+
+kernel void ray_march(texture2d<float, access::write> output [[texture(0)]],
+                   constant Sphere* sp [[buffer(0)]],
+                   constant Uniforms* u [[buffer(1)]],
+                   uint2 gid [[thread_position_in_grid]]){
+
+    int width = output.get_width();
+    int height = output.get_height();
+    float2 uv = (float2(width, height) * 0.5 - float2(gid) ) / height;
+    
+    float3 ro = float3(0.0, 0.0, 0.0);
+    float3 rd = normalize (float3(uv, 1.0));
+
+    float cdist = 1 - (length(uv));
+    float3 bg = mix(0, 1, cdist);
+
+    float3 light = bg;
+    
+    float4 d = castRay(ro, rd, u, sp);
+    
+    if (d.w < MAX_DIST) {
+       float3 p = ro + d.w * rd;
+       light = getLight(p, u, sp, bg, rd, d.xyz);
+     }
+
+    float3 col = light;
+   
+    output.write(float4(col, 1.0), gid);
+}
+
+"""
+
+func animationFunc(_ uniforms: inout Uniforms){
+    
+    light += 0.02354
+    if light > .pi*2 {light = 0}
+    
+    //if isOn{
+        dist += 0.0141
+        if dist > .pi*2 {dist = 0}
+    
+    //let d = 3 * newAnim / 1000
+    
+        _ = (0..<10).indices.map{ i in 
+            let ang = 2 * .pi / Float(uniforms.sphereCount) * Float(i) + dist
+            spheres![i] = Sphere(
+                s:float3(sin(ang)*uniforms.d,
+                         cos(ang)*uniforms.d,
+                         6),
+                c:colors[i],
+                size: uniforms.size * (1 + sin(ang*2 + dist)))
+                
+    
+    uniforms.lx = cos(light) * 3
+    uniforms.ly = sin(light) * 3
+    uniforms.lz = 0
+    
+    uniforms.t = dist
+    
+    }
+}
+struct MetalView: UIViewRepresentable {
+    
+    init(_ uniforms: Binding<Uniforms>){
+        _uniforms = uniforms
+    }
+    
+    @Binding var uniforms: Uniforms
+    
+    func makeCoordinator() -> Coordinator {
+        Coordinator(self)
+    }
+    func makeUIView(context: UIViewRepresentableContext<MetalView>) -> MTKView {
+        let mtkView = MTKView()
+        mtkView.delegate = context.coordinator
+        mtkView.preferredFramesPerSecond = 60
+        mtkView.enableSetNeedsDisplay = true
+        if let metalDevice = MTLCreateSystemDefaultDevice() {
+            mtkView.device = metalDevice
+        }
+        mtkView.framebufferOnly = false
+        //mtkView.clearColor = MTLClearColor(red: 0, green: 0, blue: 0, alpha: 0)
+        mtkView.drawableSize = mtkView.frame.size
+        mtkView.enableSetNeedsDisplay = false
+        mtkView.isPaused = false
+        
+        return mtkView
+    }
+    func updateUIView(_ uiView: MTKView, context: UIViewRepresentableContext<MetalView>) {
+    }
+    class Coordinator: NSObject, MTKViewDelegate {
+        
+        var parent: MetalView
+        
+        var device: MTLDevice!
+        var rayMarchPass: MTLComputePipelineState!
+        var commandQueue: MTLCommandQueue!
+        
+        init(_ parent: MetalView) {
+            self.parent = parent
+            if let metalDevice = MTLCreateSystemDefaultDevice() {
+                self.device = metalDevice
+            }
+            self.commandQueue = device.makeCommandQueue()!
+            
+            var library: MTLLibrary!
+            
+            do{ library = try self.device?.makeLibrary(source: metalFunctions, options: nil)
+            }catch{print(error)}
+            
+            let rayMarchFunc = library?.makeFunction(name: "ray_march")
+            
+            do{ rayMarchPass = try self.device?.makeComputePipelineState(function: rayMarchFunc!)
+            }catch{print(error)}
+            
+            sphereBuffer = device?.makeBuffer(
+                length: MemoryLayout<Sphere>.stride * parent.uniforms.sphereCount,
+                options: [])
+            
+            super.init()
+        }
+        func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {
+        }
+    }
+}
+
+extension MetalView.Coordinator{
+    
+    func draw(in view: MTKView) {
+        
+        animationFunc(&parent.uniforms)
+        
+        guard let drawable = view.currentDrawable else { return }
+        
+        let commandbuffer = commandQueue.makeCommandBuffer()
+ 
+        //Render
+        let computeCommandEncoder = commandbuffer?.makeComputeCommandEncoder()
+        
+        computeCommandEncoder?.setComputePipelineState(rayMarchPass)
+        computeCommandEncoder?.setTexture(drawable.texture, index: 0)
+        computeCommandEncoder?.setBuffer(sphereBuffer, offset: 0, index: 0)
+        computeCommandEncoder?.setBytes(&parent.uniforms, length: MemoryLayout<Uniforms>.stride, index: 1)
+        
+        let w = rayMarchPass.threadExecutionWidth
+        let h = rayMarchPass.maxTotalThreadsPerThreadgroup / w
+        
+        let threadsPerThreadGroup = MTLSize(width: w, height: h, depth: 1)
+        
+        let threadgroupsPerGrid = MTLSize(width: drawable.texture.width / w, height: drawable.texture.height / h, depth: 1)
+        
+        computeCommandEncoder?.dispatchThreadgroups(threadgroupsPerGrid, threadsPerThreadgroup: threadsPerThreadGroup)
+        
+        computeCommandEncoder?.endEncoding()
+        commandbuffer?.present(drawable)
+        commandbuffer?.commit()
+    }
+}
+
+struct RMView: View {
+    
+    init(_ uniforms: Binding<Uniforms>){
+        _uniforms = uniforms
+    }
+    
+    @Binding var uniforms: Uniforms
+    
+    var body: some View{
+        MetalView($uniforms)
+            .clipShape(RoundedRectangle(cornerRadius: 10))
+            .frame(width: 512, height: 512)
+            .shadow(radius: 5)
+            .onAppear(){
+                
+                spheres = sphereBuffer!.contents().bindMemory(to: Sphere.self, capacity: MemoryLayout<Sphere>.stride * uniforms.sphereCount)
+                
+                DispatchQueue.global().asyncAfter(deadline: .now() + 0.5){
+                }
+                light = 0
+            }
+            }
+    }
+
+
+struct ContentView:View {
+    
+    @State var uniforms = Uniforms()
+    
+    var body: some View{
+        VStack{
+            RMView($uniforms)
+            Slider(value: $uniforms.d, in: 0...2)
+            Slider(value: $uniforms.k, in: 0...1)
+            Slider(value: $uniforms.size, in: 0...1)
+        }
+    }
+}
+
+
+PlaygroundPage.current.setLiveView(ContentView())
