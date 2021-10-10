@@ -165,20 +165,12 @@ float3 getNormal ( float3 p, constant Uniforms *u) {
 }
 
 float3 getLight( float3 p, constant Uniforms *u, texture2d<float, access::sample> m, float3 rd, float3 bg) {
-  //float3 lightPos = float3(u->lx, u->ly, u->lz);
-  //float3 l = normalize( lightPos - p );
+
   float3 n = getNormal(p, u);
-  
-  //float diff = dot(l, n);
 
   constexpr sampler s(address::clamp_to_edge, filter::linear);
 
   float3 diff = float3(m.sample(s, matcap(-rd, n)));
-  
-  //float ls = castRay(p + n * (SURF_DIST*2.), l, u);
-  //float dl = length(lightPos - p);
-  
-  //if (ls < dl) { diff *= 0.5;}
 
   float frensel = pow(1. + dot(rd, n), 3);
   diff = mix(diff, bg, frensel);
@@ -236,11 +228,9 @@ func animationFunc(_ uniforms: inout Uniforms){
     light += 0.02354
     if light > .pi*2 {light = 0}
     
-    //if isOn{
         dist += 0.0141
         if dist > .pi*2 {dist = 0}
     
-    //uniforms.lx = sin((uniforms.blend+Float(uniforms.last)+1) * .pi * (Float(uniforms.next)+1))
     uniforms.lx = 3*sin((uniforms.blend+1) * .pi)
     uniforms.ly = -uniforms.lx
     uniforms.lz = 0
