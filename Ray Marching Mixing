@@ -52,7 +52,7 @@ struct Uniforms {
     var d: Float = 0
     
     //Spheres
-    var sphereCount: Int = 10
+    var sphereCount: Int32 = 10
     var size: Float = 0
 }
 
