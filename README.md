@@ -9,8 +9,13 @@ A collection of interactive animations made with code in Swift Playgrounds app
     <a href="https://en.wikipedia.org/wiki/MIT_License"><img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License: MIT" /></a>                                                                                                                                     </p>
                                                                                                                                        
 Click on images to see the code :point_down:   
+
+#### Ray Marching Blending Matcaps (with Metal shader inside a SwiftUI view)
+<p align="left">
+   <a href="https://github.com/gadirom/Art-in-Swift/blob/main/Raymarching%20Blending%20Matcaps.swift"><img src="GIFs/Raymarching Blending Matcaps.GIF" alt="GIF"/>
+</p>     
     
-#### Ray Marching Mixing (with Metal shader inside a SwiftUI view)
+#### Ray Marching Mixing Colors (with Metal shader inside a SwiftUI view)
 <p align="left">
    <a href="https://github.com/gadirom/Art-in-Swift/blob/main/Ray%20Marching%20Mixing.swift"><img src="GIFs/Ray Marching Mixing.gif" alt="GIF"/>
 </p>      
