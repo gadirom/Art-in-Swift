@@ -10,7 +10,6 @@ import PlaygroundSupport
 import Combine
 import simd
 
-var light: Float = 0
 var dist: Float = 0
 
 struct Uniforms {
@@ -225,9 +224,6 @@ tex2.write(color, id);
 
 func animationFunc(_ uniforms: inout Uniforms){
     
-    light += 0.02354
-    if light > .pi*2 {light = 0}
-    
         dist += 0.0141
         if dist > .pi*2 {dist = 0}
     
@@ -440,14 +436,8 @@ struct RMView: View {
             .clipShape(RoundedRectangle(cornerRadius: 10))
             .frame(width: 512, height: 512)
             .shadow(radius: 5)
-            .onAppear(){
-                
-                DispatchQueue.global().asyncAfter(deadline: .now() + 0.5){
-                }
-                light = 0
-            }
-            }
     }
+}
 
 
 struct ContentView:View {
