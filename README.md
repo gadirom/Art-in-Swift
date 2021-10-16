@@ -10,6 +10,13 @@ A collection of interactive animations made with code in Swift Playgrounds app
                                                                                                                                        
 Click on images to see the code :point_down:   
 
+
+
+#### Worms (via Core Graphics)
+<p align="left">
+   <a href="https://github.com/gadirom/Art-in-Swift/blob/main/Worms.swift"><img src="GIFs/Worms.gif" alt="GIF"/>
+</p>     
+
 #### Ray Marching Blending Matcaps (with Metal shader inside a SwiftUI view)
 <p align="left">
    <a href="https://github.com/gadirom/Art-in-Swift/blob/main/Raymarching%20Blending%20Matcaps.swift"><img src="GIFs/Raymarching Blending Matcaps.GIF" alt="GIF"/>
