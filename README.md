@@ -15,7 +15,7 @@ Click on images to see the code :point_down:
    <a href="https://github.com/gadirom/Art-in-Swift/blob/main/Squid Game SDF.swift"><img src="GIFs/Squid Game SDF.GIF" alt="GIF"/>
 </p>     
 
-#### Worms (via Core Graphics)
+#### Worms (thread simulation drawn via Core Graphics)
 <p align="left">
    <a href="https://github.com/gadirom/Art-in-Swift/blob/main/Worms.swift"><img src="GIFs/Worms.gif" alt="GIF"/>
 </p>     
