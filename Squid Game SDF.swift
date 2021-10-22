@@ -1,3 +1,7 @@
+// Just copy and paste the code into a blank playground template
+// in Swift Playgrounds app on an iPad or a Mac
+// !!! Turn off Enable Results in the settings, otherwise you'll get an error !!!
+// Created by Roman Gaditskiy: https://GitHub.com/gadirom/Art-in-Swift
 
 import MetalKit
 import PlaygroundSupport
@@ -224,8 +228,7 @@ Vertex p = vertices[id];
 float2 n = accel(p.position, u, id);
 p.position += p.velocity;
 p.velocity += n * u->speed;
-//p.velocity.x += (0.5-rand(int(id), int(p.color.x), int(p.velocity.y)))*u->noise;
-//p.velocity.y += (0.5-rand(int(p.color.y), int(id), int(p.velocity.x)))*u->noise;
+
 p.velocity += hash1(float3(float(id), p.color.xy)).xy*u->noise;
 p.velocity *= pow(u->friction, 1+float(u->id)*2);
 p.color.g = pow(length(p.velocity ), 0.2);
