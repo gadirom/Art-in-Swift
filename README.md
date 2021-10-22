@@ -10,7 +10,10 @@ A collection of interactive animations made with code in Swift Playgrounds app
                                                                                                                                        
 Click on images to see the code :point_down:   
 
-
+#### Squid Game (particles moving in fields shaped by SDFs)
+<p align="left">
+   <a href="https://github.com/gadirom/Art-in-Swift/blob/main/Squid Game SDF.swift"><img src="GIFs/Squid Game SDF.GIF" alt="GIF"/>
+</p>     
 
 #### Worms (via Core Graphics)
 <p align="left">
@@ -32,12 +35,12 @@ Click on images to see the code :point_down:
    <a href="https://github.com/gadirom/Art-in-Swift/blob/main/Ray%20Marching%20Toggle.swift"><img src="GIFs/Ray Marching Toggle.gif" alt="GIF"/>
 </p>      
     
-#### Button on Ropes (physics simulation in real time)
+#### Button on Ropes (physics simulation in real time in SwiftUI view)
 <p align="left">
    <a href="https://github.com/gadirom/Art-in-Swift/blob/main/Button%20on%20Ropes.swift"><img src="GIFs/Button on Ropes.gif" alt="GIF"/>
 </p>      
     
-#### Crashing Buttons
+#### Crashing Buttons in SwiftUI
 <p align="left">
    <a href="https://github.com/gadirom/Art-in-Swift/blob/main/Crashing%20Button.swift"><img src="GIFs/Crashing Buttons .GIF" alt="GIF"/>
 </p>      
