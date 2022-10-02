@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Bucket
+   uuid = "1BEA568E-AED1-4301-90A9-B1FF349F0994"
+   type = "1"
+   version = "2.0">
+   <Breakpoints>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "54A71C25-DCF2-4554-9836-DE9F3FD7F0D2"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../../../../Developer/Xcode/DerivedData/MetalBuilder_water-arbbzxvhmxkkeiezclntafsyofkq/SourcePackages/checkouts/MetalBuilder/Sources/MetalBuilder/Parser/ArgumentsToFunc/MetalFunctionArgument.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "95"
+            endingLineNumber = "95"
+            landmarkName = "init(_:space:type:name:index:)"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "54A71C25-DCF2-4554-9836-DE9F3FD7F0D2 - afedf5806bee3c2a"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "MetalBuilder.MetalBufferArgument.init&lt;&#x3c4;_0_0&gt;(_: MetalBuilder.MTLBufferContainer&lt;&#x3c4;_0_0&gt;, space: Swift.String, type: Swift.Optional&lt;Swift.String&gt;, name: Swift.Optional&lt;Swift.String&gt;, index: Swift.Optional&lt;Swift.Int&gt;) throws -&gt; MetalBuilder.MetalBufferArgument"
+                  moduleName = "My App"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/gadirom/Library/Developer/Xcode/DerivedData/MetalBuilder_water-arbbzxvhmxkkeiezclntafsyofkq/SourcePackages/checkouts/MetalBuilder/Sources/MetalBuilder/Parser/ArgumentsToFunc/MetalFunctionArgument.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "95"
+                  endingLineNumber = "95"
+                  offsetFromSymbolStart = "696">
+               </Location>
+               <Location
+                  uuid = "54A71C25-DCF2-4554-9836-DE9F3FD7F0D2 - afedf5806bee3c2a"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "MetalBuilder.MetalBufferArgument.init&lt;&#x3c4;_0_0&gt;(_: MetalBuilder.MTLBufferContainer&lt;&#x3c4;_0_0&gt;, space: Swift.String, type: Swift.Optional&lt;Swift.String&gt;, name: Swift.Optional&lt;Swift.String&gt;, index: Swift.Optional&lt;Swift.Int&gt;) throws -&gt; MetalBuilder.MetalBufferArgument"
+                  moduleName = "My App"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/gadirom/Library/Developer/Xcode/DerivedData/MetalBuilder_water-arbbzxvhmxkkeiezclntafsyofkq/SourcePackages/checkouts/MetalBuilder/Sources/MetalBuilder/Parser/ArgumentsToFunc/MetalFunctionArgument.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "95"
+                  endingLineNumber = "95"
+                  offsetFromSymbolStart = "732">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "8C7E2AC9-B0A8-45F7-A676-552179BB5716"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../../../../Developer/Xcode/DerivedData/MetalBuilder_water-arbbzxvhmxkkeiezclntafsyofkq/SourcePackages/checkouts/MetalBuilder/Sources/MetalBuilder/Parser/ArgumentsToFunc/MetalFunctionArgument.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "99"
+            endingLineNumber = "99"
+            landmarkName = "init(_:space:type:name:index:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+   </Breakpoints>
+</Bucket>

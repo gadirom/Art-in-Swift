@@ -8,7 +8,13 @@ A collection of interactive animations made with code in Swift Playgrounds app
     <a href="https://apps.apple.com/ru/app/swift-playgrounds/id908519492?l=en"><img src="https://img.shields.io/badge/SwiftPlaygrounds-3.4.1-orange.svg" alt="Swift Playgrounds 3" /></a>
     <a href="https://en.wikipedia.org/wiki/MIT_License"><img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License: MIT" /></a>                                                                                                                                     </p>
                                                                                                                                        
-Click on images to see the code :point_down:   
+Click on images to see the code :point_down: 
+
+#### Density Simulator (uses [MetalBuilder](https://github.com/gadirom/MetalBuilder) and [ReordableViews](https://github.com/gadirom/ReordableViews))
+<p align="left">
+   <a href="https://github.com/gadirom/Art-in-Swift/blob/main/Density simulator.swiftpm"><img src="GIFs/DensitySimulator.gif" alt="GIF"/>
+</p>     
+  
 
 #### Squid Game (particles moving in fields shaped by SDFs)
 <p align="left">
