@@ -1,5 +1,9 @@
 # Density Simulator
 
+<p align="left">
+   <a href="https://github.com/gadirom/Art-in-Swift/blob/main/Density simulator.swiftpm"><img src="GIFs/DensitySimulator.gif" alt="GIF"/>
+</p>     
+
 This is a little app that you can open in Swift Playgrounds on an iPad.
 
 It uses two of my open source packages:
