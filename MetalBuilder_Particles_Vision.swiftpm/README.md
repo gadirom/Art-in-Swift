@@ -12,4 +12,4 @@ This is an example of how you can use camera, Apple's Vision framework and atomi
 
 The sound is made by AVAudioEngine.
 
-To run on iPad download the whole repository [Art-in-Swift](https://github.com/gadirom/Art-in-Swift) (Code->Download ZIP), run Files and unzip, then open this package (Density Simulator).
+To run on iPad download the whole repository [Art-in-Swift](https://github.com/gadirom/Art-in-Swift) (Code->Download ZIP), run Files and unzip, then open this package (MetalBuilder_Particles_Vision).
