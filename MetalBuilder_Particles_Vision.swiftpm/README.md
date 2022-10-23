@@ -4,7 +4,7 @@
    <img src="../GIFs/Particles_Vision.gif" alt="GIF"/>
 </p>     
 
-This is a little app that you can open in Swift Playgrounds on an iPad.
+This is a little app that you can open in Swift Playgrounds on an iPad/Mac.
 
 The particles moving being aware of the human figure captured by the camera. When a particle attain a certain speed it produces sound and is colored in white. Also, the position of hands changes parameters of the simulation. 
 

@@ -12,7 +12,7 @@ Click on images to see the code :point_down:
 
 
 
-#### Particles+Vision (uses [MetalBuilder](https://github.com/gadirom/MetalBuilder)
+#### Particles+Vision (uses [MetalBuilder](https://github.com/gadirom/MetalBuilder))
 <p align="left">
    <a href="https://github.com/gadirom/Art-in-Swift/blob/main/Density MetalBuilder_Particles_Vision.swiftpm"><img src="GIFs/Particles_Vision.gif" alt="GIF"/>
 </p>     
