@@ -27,11 +27,6 @@ Click on images to see the code :point_down:
    <a href="https://github.com/gadirom/Art-in-Swift/blob/main/Density simulator.swiftpm"><img src="GIFs/DensitySimulator.gif" alt="GIF"/>
 </p>     
 
-#### Squid Game (particles moving in fields shaped by SDFs)
-<p align="left">
-   <a href="https://github.com/gadirom/Art-in-Swift/blob/main/Squid Game SDF.swift"><img src="GIFs/Squid Game SDF.GIF" alt="GIF"/>
-</p>     
-
 #### Worms (thread simulation drawn via Core Graphics)
 <p align="left">
    <a href="https://github.com/gadirom/Art-in-Swift/blob/main/Worms.swift"><img src="GIFs/Worms.gif" alt="GIF"/>

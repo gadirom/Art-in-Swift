@@ -1,4 +1,4 @@
-# Density Simulator
+# Particles+Vision
 
 <p align="center">
    <img src="../GIFs/Particles_Vision.gif" alt="GIF"/>
