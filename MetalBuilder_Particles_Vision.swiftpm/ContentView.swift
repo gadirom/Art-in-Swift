@@ -96,7 +96,7 @@ struct ContentView: View {
     @MetalState var cameraReady = false
 
     @MetalState var dragging = false
-    @MetalState var coord: simd_float2 = [0, 0]
+    @MetalState var touchPoint = CGPoint()
     @State var save = false
     @State var load = false
     @MetalState var data = Data()
@@ -139,26 +139,41 @@ struct ContentView: View {
                     let time = context.time
                     self.lastTime = time
                     fps = fps*0.99+0.01/(time-lastTime)
-                    //if $dragging.wrappedValue{
                     
-                    print(leftWristVisible)
-                    print(leftWristPoint)
-                    print(rightWristVisible)
-                    print(rightWristPoint)
+                    if $dragging.wrappedValue{
+                        print("Coord:Touch point:", touchPoint)
+                        setBreed(2)
+                        let size = simd_float2(context.viewportSize)
+                        var coord: simd_float2 =
+                        [Float(touchPoint.x)*context.scaleFactor*2,
+                         Float(touchPoint.y)*context.scaleFactor*2]
+                        coord /= size
+                        coord -= 1
+                        coord *= simd_float2(1, -1)
+                        createParticle(coord: coord)
+                                    //let coord = (context.scaleFactor*2*coord/simd_float2(size)-1)*simd_float2(1, -1)
+                        //uniforms.setFloat(0.1, for: "fric")
+                        //uniforms.setFloat(1, for: "size")
+                    }
                     
                     if leftWristVisible{
+                        print("Coord:left wrist:", leftWristPoint)
                         setBreed(0)
-                        createParticle(point: leftWristPoint, context: context)
-                        uniforms.setFloat(Float(leftWristPoint.y), for: "fric")
-                        uniforms.setFloat(Float(leftWristPoint.x), for: "size")
+                        let coord: simd_float2 = [Float(rightWristPoint.x)*context.scaleFactor-1,
+                           Float(rightWristPoint.y)*context.scaleFactor-1]
+                        createParticle(coord: coord)
+                        //uniforms.setFloat(Float(leftWristPoint.y), for: "fric")
+                        //uniforms.setFloat(Float(leftWristPoint.x), for: "size")
                     }
                     if rightWristVisible{
+                        print("Coord:right wrist:", rightWristPoint)
                         setBreed(1)
-                        createParticle(point: rightWristPoint, context: context)
-                        uniforms.setFloat(Float(rightWristPoint.y)*10, for: "sigma")
-                        uniforms.setFloat(Float(rightWristPoint.x), for: "dim")
+                        let coord: simd_float2 = [Float(leftWristPoint.x)*context.scaleFactor-1,
+                           Float(leftWristPoint.y)*context.scaleFactor-1]
+                        createParticle(coord: coord)
+                        //uniforms.setFloat(Float(rightWristPoint.y)*10, for: "sigma")
+                        //uniforms.setFloat(Float(rightWristPoint.x), for: "dim")
                     }
-                    //}
                 }
 //                Camera(context: context,
 //                       texture: maskTexture,
@@ -230,7 +245,6 @@ struct ContentView: View {
                         //saveTexture(device: device)
                         bufData = particlesBuffer.getData()
                         save = false
-                        //play = 1
                     }
                 }
                 EncodeGroup(active: $load){
@@ -242,7 +256,6 @@ struct ContentView: View {
                         particlesBuffer.load(data: bufData)
                         print("loaded")
                         load = false
-                        //play = 1
                     }
                 }
                 BlitTexture()
@@ -253,8 +266,7 @@ struct ContentView: View {
             }
             .gesture(DragGesture(minimumDistance: 0, coordinateSpace: .local)
                 .onChanged{ value in
-                    coord = [Float(value.location.x),
-                             Float(value.location.y)]
+                    touchPoint = value.location
                     //print(coord)
                     dragging = true
                 }
@@ -280,9 +292,6 @@ struct ContentView: View {
                     .gesture(DragGesture(minimumDistance: 0, coordinateSpace: .local)
                         .onChanged{ value in
                             setBreed(breed)
-                            coord = [Float.random(in: 0...2000),
-                                     Float.random(in: 0...2000)]
-                            //print(coord)
                             dragging = true
                         }
                         .onEnded{_ in
@@ -370,12 +379,8 @@ struct ContentView: View {
             }
         }
     }
-    func createParticle(point: CGPoint, context: MetalBuilderRenderingContext){
-        let coord: simd_float2 = [Float(point.x*2)-1,
-                                  Float(point.y*2)]
+    func createParticle(coord: simd_float2){
         for _ in 0..<Int(uniforms.getFloat("pressure")!){
-            //let size = context.viewportSize
-            //let coord = (context.scaleFactor*2*coord/simd_float2(size)-1)*simd_float2(1, -1)
             let velo = simd_float2.random(in: 0...0.01)
             particlesBuffer.pointer![$particleId.wrappedValue].coord = [coord.x, coord.y, coord.x-velo.x, coord.y-velo.y]
             particlesBuffer.pointer![$particleId.wrappedValue].size = Float.random(in: 0.05...0.05)
@@ -436,7 +441,9 @@ fragment float4 fragmentShader(VertexOut in [[stage_in]],
     if(length(p-.5)>0.5) discard_fragment();
     return in.color;
 }
-kernel void integration(uint id [[thread_position_in_grid]]){
+kernel void integration(uint id [[thread_position_in_grid]],
+                      uint count [[threads_per_grid]]){
+   if(id>=count) return;
    //Integration
    Particle p = particles[id];
    float2 velo = p.coord.xy-p.coord.zw;
@@ -454,6 +461,7 @@ kernel void integration(uint id [[thread_position_in_grid]]){
    n = length(n)==0 ? float2(0) : normalize(n);
    d = .5-d;
    n *= sign(d) * pow(abs(d), 1.);
+   n = 0;
    //float2 sdfForce = n*(d);
    
    float2 force = n*u.gravity;//+p.force;//+sdfForce;
@@ -475,7 +483,7 @@ kernel void integration(uint id [[thread_position_in_grid]]){
 
 kernel void collision(uint id [[thread_position_in_grid]],
                       uint count [[threads_per_grid]]){
-
+   if(id>=count) return;
   Particle p = particlesIn[id];
   float2 fgrav = 0;
   //float2 frep = 0;
@@ -516,7 +524,7 @@ kernel void collision(uint id [[thread_position_in_grid]],
               note.hit = 1;
               note.coord = p.coord;
               note.instrument = p.breed;
-              notes[currentNote-1]=note;
+              notes[currentNote]=note;
           }
       p.coord.xy = p.coord.zw + n*dist;
    }

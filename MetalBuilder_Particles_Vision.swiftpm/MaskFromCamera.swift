@@ -45,6 +45,8 @@ struct MaskFromCamera: MetalBuildingBlock {
     @MetalState var maskPixelBuffer: CVPixelBuffer?
     @MetalState var ciContext: CIContext!
     
+    //@MetalState var temp = false
+    
     var metalContent: MetalContent {
                 Camera(context: context,
                        texture: cameraTexture,
@@ -74,7 +76,8 @@ struct MaskFromCamera: MetalBuildingBlock {
                             if newTextureIsNeeded{
                                 let size = CGSize(width: CVPixelBufferGetWidth(maskPixelBuffer),
                                                   height: CVPixelBufferGetHeight(maskPixelBuffer))
-                                print(size)
+                            
+                                print("creating new texture for the mask: ", size)
                                 
                                 let tempTexture = MTLTextureContainer(camTextureDesc
                                                                     .usage([.shaderRead, .shaderWrite])
