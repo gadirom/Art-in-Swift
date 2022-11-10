@@ -8,7 +8,7 @@ A collection of interactive animations made with code in Swift Playgrounds app
     <a href="https://apps.apple.com/ru/app/swift-playgrounds/id908519492?l=en"><img src="https://img.shields.io/badge/SwiftPlaygrounds-3.4.1-orange.svg" alt="Swift Playgrounds 3" /></a>
     <a href="https://en.wikipedia.org/wiki/MIT_License"><img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License: MIT" /></a>                                                                                                                                     </p>
                                                                                                                                        
-Click on images to see the code :point_down: 
+Click on the images to see the code :point_down: 
 
 
 
