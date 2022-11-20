@@ -10,7 +10,10 @@ A collection of interactive animations made with code in Swift Playgrounds app
                                                                                                                                        
 Click on images to see the code :point_down: 
 
-
+#### Splines Renderer (uses [MetalBuilder](https://github.com/gadirom/MetalBuilder))
+<p align="left">
+   <a href="https://github.com/gadirom/Art-in-Swift/blob/main/SplinesRenderer.swiftpm"><img src="GIFs/SplineRenderer.gif" alt="GIF"/>
+</p> 
 
 #### Particles+Vision (uses [MetalBuilder](https://github.com/gadirom/MetalBuilder))
 <p align="left">

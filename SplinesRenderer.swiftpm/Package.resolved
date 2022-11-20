@@ -1,0 +1,23 @@
+{
+  "pins" : [
+    {
+      "identity" : "metalbuilder",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/MetalBuilder/MetalBuilder",
+      "state" : {
+        "branch" : "main",
+        "revision" : "7f0e3acc46ba6c8ddf4df15670f4b6ab48f4a36b"
+      }
+    },
+    {
+      "identity" : "swift-collections",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-collections",
+      "state" : {
+        "revision" : "48254824bb4248676bf7ce56014ff57b142b77eb",
+        "version" : "1.0.2"
+      }
+    }
+  ],
+  "version" : 2
+}
