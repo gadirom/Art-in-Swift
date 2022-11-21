@@ -1,5 +1,7 @@
 # Splines Renderer
 
+(This app uses MetalBuilder's main branch and therefore will crash Swift Playgrounds. I will post an updated version as soon as the new version of MetalBuilder released)
+
 This app is based on the dynamyc lines renderer - the MetalBuilder building block that renders strokes in the form of interpolating splines.
 The splines connect the points that you pass in a buffer which element type is conforming to `MetalBuilderPointProtocol`.
 This means that with MetalBuilder you may leverage the features of Swift language for Metal objects.
@@ -12,5 +14,5 @@ The rendering pipline uses indexed primitives and has compute shaders that are d
 - calculate vertices of the stroke sides
 - render the indexed mesh
 
-You may pass a FragmentShader as a parameter of the LinesRenderer to fully control the appearence of the splines.
+For to fully control the appearance of the mesh you may pass a FragmentShader as a parameter to the LinesRenderer.
 
