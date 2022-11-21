@@ -1,10 +1,3 @@
-//
-//  File.swift
-//  My App
-//
-//  Created by Roman Gaditskiy on 19.11.2022.
-//
-
 import SwiftUI
 import MetalKit
 import MetalBuilder
