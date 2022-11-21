@@ -14,5 +14,6 @@ The rendering pipline uses indexed primitives and has compute shaders that are d
 - calculate vertices of the stroke sides
 - render the indexed mesh
 
-For to fully control the appearance of the mesh you may pass a FragmentShader as a parameter to the LinesRenderer.
+For a full control over the appearance of the mesh you may pass a FragmentShader as a parameter to the LinesRenderer.
+More documentation on how to use this block is in the code.
 
