@@ -1,6 +1,6 @@
 # Splines Renderer
 
-(This app uses MetalBuilder's main branch and therefore will crash Swift Playgrounds. I will post an updated version as soon as the new version of MetalBuilder released)
+(This app uses MetalBuilder's main branch and therefore will crash Swift Playgrounds. I will post an updated version as soon as the new version of MetalBuilder is released)
 
 This app is based on the dynamyc lines renderer - the MetalBuilder building block that renders strokes in the form of interpolating splines.
 The splines connect the points that you pass in a buffer which element type is conforming to `MetalBuilderPointProtocol`.
