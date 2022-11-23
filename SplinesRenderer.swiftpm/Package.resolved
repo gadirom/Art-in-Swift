@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/MetalBuilder/MetalBuilder",
       "state" : {
-        "branch" : "main",
-        "revision" : "7f0e3acc46ba6c8ddf4df15670f4b6ab48f4a36b"
+        "revision" : "81359e5101713e62474ed7ad0baad1748ae829f8",
+        "version" : "0.2.1"
       }
     },
     {

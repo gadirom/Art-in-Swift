@@ -1,7 +1,6 @@
 import SwiftUI
 import MetalBuilder
 import MetalKit
-import MetalPerformanceShaders
 
 struct Particle: MetalBuilderPointProtocol{
     var type: UInt32 = 0
@@ -24,19 +23,12 @@ let colors: [Color] = [.indigo, .yellow, .mint, .brown, .pink]
 
 struct ContentView: View {
     
-    @MetalTexture(TextureDescriptor()
-        .pixelFormatFromDrawable()
-        .sizeFromViewport()
-        .usage([.renderTarget, .shaderRead])) var targetTexture
-    
     @MetalBuffer<Particle>(bufDescriptor) var particlesBuffer
     
     @MetalBuffer<MetalBuilderPoint>(count: 100, metalName: "curvedPoints") var curvedPointsBuffer
     
     @MetalUniforms(UniformsDescriptor()
         .float("speed", range: 0...100, value: 5)) var uniforms
-    
-    @State var isDrawing = false
     
     @State var breed = 0
     
@@ -49,7 +41,7 @@ struct ContentView: View {
     @State var pointsCreator: PointsCreator!
     
     @State var shifting = false
-    @State var growing = false
+    @State var glow = false
     
     var viewSettings: MetalBuilderViewSettings{
         MetalBuilderViewSettings(depthStencilPixelFormat: .depth32Float,
@@ -58,17 +50,17 @@ struct ContentView: View {
                                  preferredFramesPerSecond: 120)
     }
     
-    @MetalUniforms(MBLinesRendererUniformsDescriptor
+    @MetalUniforms(MBSplinesRendererUniformsDescriptor
         .float("deform", range: 0...10)
         .float("deformFreq", range: 0...100)
                    , type: "Uni") var uni
     
     var fragment: FragmentShader{
-        FragmentShader("metalBuilderLinesRenderer_FragmentShader",
+        FragmentShader("metalBuilderSplinesRenderer_FragmentShader",
                                    source:
     """
     fragment
-    float4 metalBuilderLinesRenderer_FragmentShader(metalBuilderLinesRenderer_VertexOut in [[stage_in]]){
+    float4 metalBuilderSplinesRenderer_FragmentShader(metalBuilderSplinesRenderer_VertexOut in [[stage_in]]){
         float edge = u.edge;
         
         float mask = 1.;
@@ -105,14 +97,17 @@ struct ContentView: View {
     var body: some View {
         VStack {
             MetalBuilderView(helpers: simplexNoise1,
-                             isDrawing: $isDrawing,
                              viewSettings: viewSettings) { context in
                 ManualEncode{_,_,_ in
+                    if glow{
+                        context.resumeTime()
+                    }else{
+                        context.pauseTime()
+                    }
                     time = context.time
                 }
                 EncodeGroup(active: $clearRender){
                     ClearRender()
-                        .texture(targetTexture)
                         .color(.white)
                 }
                 EncodeGroup(active: $drawing){
@@ -132,13 +127,12 @@ struct ContentView: View {
                         }
                     }
                 }
-                LinesRenderer(context: context,
+                SplinesRenderer(context: context,
                               count: $pointsCount,
                               maxCount: particlesCount,
                               maxSegmentsCount: maxSegments,
                               pointsBuffer: particlesBuffer,
                               curvesPointsBuffer: curvedPointsBuffer,
-                              toTexture: targetTexture,
                               uniforms: uni,
                               fragment: fragment)
                 EncodeGroup(active: $shifting){
@@ -187,56 +181,8 @@ struct ContentView: View {
                         }
                         """)
                 }
-                EncodeGroup(active: $growing){
-                    Compute("growStrokes")
-                        .buffer(particlesBuffer, space: "device", name: "points", fitThreads: true)
-                        .bytes($pointsCount, name: "count")
-                        .uniforms(uni, name: "u")
-                        .uniforms(uniforms, name: "uniforms")
-                        .source("""
-                        kernel void growStrokes(uint id [[thread_position_in_grid]]){
-                            if(id>=count) return;
-                        
-                            auto p = points[id];
-                            
-                            float2 step;
-                            
-                            if(id>0){
-                                auto p0 = points[id-1];
-                                //end control
-                                if(p.type == 0 && p0.type == 2){
-                                    step = (p.pos-p0.pos)/floor(u.segmentsCount);
-                                }
-                                //start
-                                if(p.type == 3){
-                                    step = (p0.pos-p.pos)/floor(u.segmentsCount);
-                                }
-                            }
-                            //start control
-                            if(id<count-1){
-                                auto p1 = points[id+1];
-                                if(p.type == 0 && p1.type == 3){
-                                    step = (p.pos-p1.pos)/floor(u.segmentsCount);
-                                }
-                            }
-                            
-                            //middle or end
-                            if(p.type==1||p.type==2){
-                                uint sc = uint(u.segmentsCount);
-                                uint cId = (id-1)*sc-1;
-                                step = 0;//curvedPoints[cId].pos - p.pos;
-                            }
-                            step = normalize(step)*uniforms.speed;
-                            p.pos += step;
-                            points[id] = p;
-                        }
-                        """)
-                }
-                BlitTexture()
-                    .source(targetTexture)
             }.onResize { size in
                 restart()
-                isDrawing = true
             }
             .gesture(DragGesture(minimumDistance: 0, coordinateSpace: .local)
                 .onChanged{ value in
@@ -257,16 +203,14 @@ struct ContentView: View {
                     }
                     .padding()
                     Button {
-                        growing.toggle()
-                        pointsCount = particlesCount
-                        drawing = false
+                        glow.toggle()
                     } label: {
-                        Text("Grow!")
+                        Text("Glow!")
                             .font(.system(size: 50))
                     }
                     .padding()
                     .overlay(
-                        growing ?
+                        glow ?
                         RoundedRectangle(cornerRadius: 5)
                             .stroke(Color.white)
                         :

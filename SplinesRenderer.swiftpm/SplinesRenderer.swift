@@ -7,13 +7,13 @@ import MetalKit
 //    case inactive=0, active=1, last=2, first=3
 //}
 
-let MBLinesRendererUniformsDescriptor = UniformsDescriptor()
-    .float2("uvScale", range: 0...100)
-    .float("thickness", range: 0...10)
-    .float("edge", range: 0...50)
-    .float("alpha", range: 0...1)
-    .float("tension", range: 0...1)
-    .float("segmentsCount", range: 0...50)
+let MBSplinesRendererUniformsDescriptor = UniformsDescriptor()
+    .float2("uvScale", range: 0...100, value: [0.1,0.1])
+    .float("thickness", range: 0...10, value: 5)
+    .float("edge", range: 0...50, value: 1)
+    .float("alpha", range: 0...1, value: 1)
+    .float("tension", range: 0...1, value: 0)
+    .float("segmentsCount", range: 0...50, value: 20)
 
 public protocol MetalBuilderPointProtocol: MetalStruct{
     var pos: simd_float2 { get }
@@ -31,7 +31,7 @@ public struct MetalBuilderPoint: MetalBuilderPointProtocol{
     public var type: UInt32 = 0
 }
 
-struct LinesRendererVertex: MetalStruct{
+struct SplinesRendererVertex: MetalStruct{
     var pos: simd_float2 = [0,0]
     var uv: simd_float2 = [0,0]
     var vLength: Float = 0
@@ -40,7 +40,7 @@ struct LinesRendererVertex: MetalStruct{
 }
 
 /// This extension is for the initializer that doesn't take `curvesPointsBuffer`
-public extension LinesRenderer where S == MetalBuilderPoint{
+public extension SplinesRenderer where S == MetalBuilderPoint{
      /// Use this init if you don't need the interpolated points
      init(context: MetalBuilderRenderingContext,
                 count: MetalBinding<Int>,
@@ -70,7 +70,7 @@ public extension LinesRenderer where S == MetalBuilderPoint{
 /// They are used only as control points with no visible splines connected to them.
 /// The second and penultimate points should have types `3` and `2` respectively .
 /// All the middle points should be of type `1`.
-public struct LinesRenderer<T, S: MetalBuilderPointProtocol>: MetalBuildingBlock {
+public struct SplinesRenderer<T, S: MetalBuilderPointProtocol>: MetalBuildingBlock {
     public init(context: MetalBuilderRenderingContext,
                 count: MetalBinding<Int>,
                 maxCount: Int,
@@ -113,7 +113,7 @@ public struct LinesRenderer<T, S: MetalBuilderPointProtocol>: MetalBuildingBlock
     
     let uniforms: UniformsContainer
     
-    @MetalBuffer<LinesRendererVertex>(count: 100, metalName: "vertexBuffer") var vertexBuffer
+    @MetalBuffer<SplinesRendererVertex>(count: 100, metalName: "vertexBuffer") var vertexBuffer
     @MetalBuffer<UInt32>(count: 100, metalName: "indexBuffer") var indexBuffer
     
     var curvedPointsBuffer: MTLBufferContainer<S>
@@ -151,11 +151,6 @@ public struct LinesRenderer<T, S: MetalBuilderPointProtocol>: MetalBuildingBlock
                 try! curvedPointsBuffer.create(device: device,
                                                count: (maxCount-2)*maxSegmentsCount)
                 bufferToCreate = false
-                viewportToDeviceTransform = .init(columns: (
-                    [2/Float(context.viewportSize[0]), 0, -1],
-                    [0, -2/Float(context.viewportSize[1]), 1],
-                    [1,  1,  1]
-                ))
             }
         }
         //Create Indices
@@ -163,17 +158,23 @@ public struct LinesRenderer<T, S: MetalBuilderPointProtocol>: MetalBuildingBlock
             pointsCounterBuffer.pointer![0] = 0
             isComputingIndices = count>3
             curvedPointsCount = (count-2)*Int(uniforms.getFloat("segmentsCount")!)
+            
+            viewportToDeviceTransform = .init(columns: (
+                [2/Float(context.viewportSize[0]), 0, -1],
+                [0, -2/Float(context.viewportSize[1]), 1],
+                [1,  1,  1]
+            ))
         }
         EncodeGroup(active: $isComputingIndices){
             //Calculating and count vertex indices
-            Compute("metalBuilderLinesRenderer_IndexComputeKernel")
+            Compute("metalBuilderSplinesRenderer_IndexComputeKernel")
                 .buffer(pointsBuffer, name: "points", fitThreads: true)
                 .buffer(indexBuffer, space: "device")
                 .buffer(pointsCounterBuffer, space: "device")
                 .bytes($count, name: "count")
                 .uniforms(uniforms, name: "u")
                 .source("""
-            kernel void metalBuilderLinesRenderer_IndexComputeKernel(
+            kernel void metalBuilderSplinesRenderer_IndexComputeKernel(
                             uint gid [[ thread_position_in_grid ]]){
                 if(gid>=count-1) return;
                 if(points[gid].type==1||points[gid].type==3){
@@ -202,13 +203,13 @@ public struct LinesRenderer<T, S: MetalBuilderPointProtocol>: MetalBuildingBlock
             }
             EncodeGroup(active: $isRendering){
                 //Calculating Spline Segments
-                Compute("metalBuilderLinesRenderer_SegmentsComputeKernel")
+                Compute("metalBuilderSplinesRenderer_SegmentsComputeKernel")
                     .buffer(pointsBuffer, name: "points", fitThreads: true)
                     .buffer(curvedPointsBuffer, space: "device", name: "curvedPoints")
                     .uniforms(uniforms, name: "u")
                     .bytes($count, name: "count")
                     .source("""
-                kernel void metalBuilderLinesRenderer_SegmentsComputeKernel(
+                kernel void metalBuilderSplinesRenderer_SegmentsComputeKernel(
                                     uint gid [[ thread_position_in_grid ]]){
                 
                     typedef remove_address_space_and_reference(curvedPoints) MB_LR_CurvedPoint;
@@ -268,13 +269,13 @@ public struct LinesRenderer<T, S: MetalBuilderPointProtocol>: MetalBuildingBlock
                 }
                 """)
                 //Calculating the side vertices of the strokes
-                Compute("metalBuilderLinesRenderer_VertexComputeKernel")
+                Compute("metalBuilderSplinesRenderer_VertexComputeKernel")
                     .buffer(curvedPointsBuffer, name: "points", fitThreads: true)
                     .buffer(vertexBuffer, space: "device")
                     .bytes($curvedPointsCount, name: "count")
                     .uniforms(uniforms, name: "u")
                     .source("""
-                kernel void metalBuilderLinesRenderer_VertexComputeKernel(
+                kernel void metalBuilderSplinesRenderer_VertexComputeKernel(
                                     uint gid [[ thread_position_in_grid ]]){
                     if(gid>=count) return;
                     if(points[gid].type==0) return;
@@ -300,13 +301,12 @@ public struct LinesRenderer<T, S: MetalBuilderPointProtocol>: MetalBuildingBlock
                     float len = points[gid].thickness*u.thickness;
                     float clampedLen = clamp(len, 0., 200.);// min max thickness
 
-                
                     float mult = 1./normalLength*clampedLen*lengthCorrection;
                     float2 leftNormal = float2(-p.y, p.x) * mult;
                     float2 rightNormal = float2(p.y, -p.x) * mult;
 
-                    LinesRendererVertex vertex1;
-                    LinesRendererVertex vertex2;
+                    SplinesRendererVertex vertex1;
+                    SplinesRendererVertex vertex2;
 
                     float2 pos1 = p0 + (last ? -leftNormal : leftNormal);
                     float2 pos2 = p0 + (last ? -rightNormal : rightNormal);
@@ -335,7 +335,7 @@ public struct LinesRenderer<T, S: MetalBuilderPointProtocol>: MetalBuildingBlock
                 }
                 """)
                 //Rendering the mesh with indexed triangles
-                Render(vertex: "metalBuilderLinesRenderer_VertexShader",
+                Render(vertex: "metalBuilderSplinesRenderer_VertexShader",
                        type: .triangle,
                        indexBuffer: indexBuffer,
                        indexCount: $indexCount)
@@ -347,28 +347,25 @@ public struct LinesRenderer<T, S: MetalBuilderPointProtocol>: MetalBuildingBlock
                         texture: toTexture,
                         loadAction: .clear,
                         clearColor: .white)
-                    .source("""
-               struct metalBuilderLinesRenderer_VertexOut{
+                    .vertexShader(VertexShader("metalBuilderSplinesRenderer_VertexShader", vertexOut: """
+               struct metalBuilderSplinesRenderer_VertexOut{
                     float4 pos [[position]];
                     float2 uv;
                     float vLength;
                     float4 color;
                };
-               vertex
-               metalBuilderLinesRenderer_VertexOut metalBuilderLinesRenderer_VertexShader(
-                                uint id [[vertex_id]]){
-                        LinesRendererVertex v = vertexBuffer[id];
-                        float3 pos3 = float3(v.pos, 1);
-                        pos3 *= viewportToDeviceTransform;
-                        
-                        metalBuilderLinesRenderer_VertexOut out;
-                        out.pos = float4(pos3.xy, v.depth, 1);
-                        out.color = v.color;
-                        out.uv = v.uv;
-                        out.vLength = v.vLength;
-                        return out;
-               }
-               """)
+               """, body: """
+                    SplinesRendererVertex v = vertexBuffer[vertex_id];
+                    float3 pos3 = float3(v.pos, 1);
+                    pos3 *= viewportToDeviceTransform;
+                    
+                    metalBuilderSplinesRenderer_VertexOut out;
+                    out.pos = float4(pos3.xy, v.depth, 1);
+                    out.color = v.color;
+                    out.uv = v.uv;
+                    out.vLength = v.vLength;
+                    return out;
+               """))
                     .fragmentShader(fragment)
             }
         }
