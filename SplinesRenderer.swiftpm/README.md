@@ -1,5 +1,9 @@
 # Splines Renderer
 
+<p align="center">
+   <img src="../GIFs/SplinesRenderer.gif" alt="GIF"/>
+</p>    
+
 This app is based on the dynamyc splines renderer - the [MetalBuilder](https://github.com/gadirom/MetalBuilder) building block that renders strokes in the form of interpolating curves.
 The splines connect the points passed in a buffer with element type conforming to `MetalBuilderPointProtocol`.
 This means that with MetalBuilder you may leverage the features of Swift language for Metal objects.
