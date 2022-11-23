@@ -6,10 +6,11 @@ This means that with MetalBuilder you may leverage the features of Swift languag
 
 The rendering pipline uses indexed primitives and has compute shaders that are dispatched in two phases:
 
-First dispatch:
+* First dispatch:
 - calculate vertex indices and count them with an atomic counter
 - copy the index count to a variable to pass to the render encoder
-Second dispatch:
+
+* Second dispatch:
 - calculate spline segments
 - calculate vertices of the stroke sides
 - render the indexed mesh
