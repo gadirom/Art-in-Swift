@@ -10,6 +10,11 @@ A collection of interactive animations made with code in Swift Playgrounds app
                                                                                                                                        
 Click on the images to see the code :point_down: 
 
+#### Verlet Engine (uses [MetalBuilder](https://github.com/gadirom/MetalBuilder) and [TransformGesture](https://github.com/gadirom/TransformGesture))
+<p align="left">
+   <a href="https://github.com/gadirom/Art-in-Swift/blob/main/VerletEngine.swiftpm"><img src="GIFs/VerletEngine.gif" alt="GIF"/>
+</p>   
+
 #### Splines Renderer (uses [MetalBuilder](https://github.com/gadirom/MetalBuilder))
 <p align="left">
    <a href="https://github.com/gadirom/Art-in-Swift/blob/main/SplinesRenderer.swiftpm"><img src="GIFs/SplineRenderer.gif" alt="GIF"/>
