@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/gadirom/MetalBuilder",
       "state" : {
-        "revision" : "8c5faa88e273329f0949718b497858c92be115c2",
-        "version" : "0.1.10"
+        "revision" : "91a154886a99864fa26b461973363547a3e2e84c",
+        "version" : "0.2.3"
       }
     },
     {

@@ -62,6 +62,11 @@ struct ContentView: View {
     
     let audioEngine = AudioEngine()
     
+    var viewSettings: MetalBuilderViewSettings{
+        MetalBuilderViewSettings(framebufferOnly: false,
+                                 preferredFramesPerSecond: 60)
+    }
+    
     @MetalTexture(texDesc
                   //.pixelFormat(.rgba16Float)
     ) var blurTexture
@@ -128,7 +133,8 @@ struct ContentView: View {
             }.padding()
             ZStack{
             MetalBuilderView(librarySource: metalFunctions,
-                             isDrawing: $isDrawing) { context in
+                             isDrawing: $isDrawing,
+                             viewSettings: viewSettings) { context in
                 ManualEncode{_, _, _ in
                     audioEngine.playNotes(notesBuffer: notesBuffer,
                                           notesCount: simultaneousNotes,
